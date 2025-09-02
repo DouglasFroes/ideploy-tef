@@ -32,6 +32,7 @@ class IdeployTefModule(reactContext: ReactApplicationContext) :
   // Action string provided by Elgin IDH docs: "com.elgin.e1.digitalhub.TEF".
   private val tefAction = "com.elgin.e1.digitalhub.TEF"
   private val tefRequestCode = 1234
+  private val customAction = "com.elgin.tefhub.CUSTOM"
 
   // We keep a single pending promise to serialize TEF calls.
   private var pendingPromise: Promise? = null
@@ -132,6 +133,17 @@ class IdeployTefModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  private fun startCustomIntent(extras: Bundle, promise: Promise) {
+    val activity = requireActivity(promise) ?: return
+    val intent = Intent(customAction).apply { putExtras(extras) }
+    try {
+      activity.startActivity(intent)
+      promise.resolve(true)
+    } catch (e: Exception) {
+      promise.reject("E_TEFCUSTOM_START", e)
+    }
+  }
+
   // Inicia uma transação TEF. Suporta vender, debito, credito e pix, com parâmetros opcionais.
   override fun iniciarTransacao(params: ReadableMap, promise: Promise) {
     val funcao = when (params.getString("tipo")?.lowercase()) {
@@ -184,6 +196,43 @@ class IdeployTefModule(reactContext: ReactApplicationContext) :
     map.putString("funcao", "confirmar")
     map.putString("mensagem", "Confirmação não é necessária no IDH TEF: o commit é automático.")
     promise.resolve(map)
+  }
+
+  // --- Customização via IDH Customização Android ---
+  // https://elgindevelopercommunity.github.io/group__idh210.html
+  override fun customizarAplicacao(params: ReadableMap, promise: Promise) {
+    val extras = Bundle()
+    extras.putString("grupo", "application")
+    getStringValue(params, "logotipo")?.let { extras.putString("logotipo", it) }
+    getStringValue(params, "background")?.let { extras.putString("background", it) }
+    getStringValue(params, "gradienteInicio")?.let { extras.putString("gradienteInicio", it) }
+    getStringValue(params, "gradienteFim")?.let { extras.putString("gradienteFim", it) }
+    startCustomIntent(extras, promise)
+  }
+
+  override fun customizarCabecalho(params: ReadableMap, promise: Promise) {
+    val extras = Bundle()
+    extras.putString("grupo", "header")
+    getStringValue(params, "corBotao")?.let { extras.putString("corBotao", it) }
+    getStringValue(params, "corIcone")?.let { extras.putString("corIcone", it) }
+    getStringValue(params, "corFonte")?.let { extras.putString("corFonte", it) }
+    startCustomIntent(extras, promise)
+  }
+
+  override fun customizarConteudo(params: ReadableMap, promise: Promise) {
+    val extras = Bundle()
+    extras.putString("grupo", "content")
+    getStringValue(params, "corBotao")?.let { extras.putString("corBotao", it) }
+    getStringValue(params, "corIcone")?.let { extras.putString("corIcone", it) }
+    getStringValue(params, "corFonte")?.let { extras.putString("corFonte", it) }
+    getStringValue(params, "corFonteMensagem")?.let { extras.putString("corFonteMensagem", it) }
+    startCustomIntent(extras, promise)
+  }
+
+  override fun limparCustomizacao(promise: Promise) {
+    val extras = Bundle()
+    extras.putString("funcao", "clear")
+    startCustomIntent(extras, promise)
   }
 
   companion object {

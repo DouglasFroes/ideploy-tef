@@ -1,7 +1,11 @@
 import {
   cancelarTransacao,
   confirmarTransacao,
+  customizarAplicacao,
+  customizarCabecalho,
+  customizarConteudo,
   iniciarTransacao,
+  limparCustomizacao,
 } from 'ideploy-tef';
 import { useState } from 'react';
 import {
@@ -28,6 +32,9 @@ export default function App() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Exemplo TEF (Android)</Text>
 
+      {/* Seção: Parâmetros básicos */}
+      <Text style={styles.sectionTitle}>Parâmetros</Text>
+
       <View style={styles.row}>
         <Text style={styles.label}>Valor:</Text>
         <TextInput style={styles.input} value={valor} onChangeText={setValor} />
@@ -49,7 +56,9 @@ export default function App() {
         <TextInput style={styles.input} value={data} onChangeText={setData} />
       </View>
 
-      <View style={styles.buttons}>
+      {/* Seção: Transações */}
+      <Text style={styles.sectionTitle}>Transações</Text>
+      <View style={styles.buttonsRow}>
         <Pressable
           style={styles.button}
           onPress={async () => {
@@ -140,7 +149,99 @@ export default function App() {
         </Pressable>
       </View>
 
-      <Text style={styles.logTitle}>Retornos</Text>
+      {/* Seção: Customização */}
+      <Text style={styles.sectionTitle}>Customização</Text>
+      <View style={styles.buttonsRow}>
+        <Pressable
+          style={styles.button}
+          onPress={async () => {
+            try {
+              const ok = await customizarAplicacao({ background: '#0099FF' });
+              appendLog('Custom Aplicação (cor sólida)', { ok });
+            } catch (e) {
+              appendLog('Erro Custom Aplicação', String(e));
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Aplicação (cor)</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.button}
+          onPress={async () => {
+            try {
+              const ok = await customizarAplicacao({
+                gradienteInicio: '#C6C6C6',
+                gradienteFim: '#6F5E21',
+              });
+              appendLog('Custom Aplicação (gradiente)', { ok });
+            } catch (e) {
+              appendLog('Erro Custom Gradiente', String(e));
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Aplicação (gradiente)</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.button}
+          onPress={async () => {
+            try {
+              const ok = await customizarCabecalho({
+                corBotao: '#363636',
+                corIcone: '#FFC321',
+                corFonte: '#FFC321',
+              });
+              appendLog('Custom Cabeçalho', { ok });
+            } catch (e) {
+              appendLog('Erro Custom Cabeçalho', String(e));
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Cabeçalho</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.button}
+          onPress={async () => {
+            try {
+              const ok = await customizarConteudo({
+                corBotao: '#363636',
+                corIcone: '#6F5E21',
+                corFonte: '#FFC321',
+                corFonteMensagem: '#4F5C7C',
+              });
+              appendLog('Custom Conteúdo', { ok });
+            } catch (e) {
+              appendLog('Erro Custom Conteúdo', String(e));
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Conteúdo</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button, styles.warning]}
+          onPress={async () => {
+            try {
+              const ok = await limparCustomizacao();
+              appendLog('Limpar Customização', { ok });
+            } catch (e) {
+              appendLog('Erro Limpar Customização', String(e));
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Limpar Customização</Text>
+        </Pressable>
+      </View>
+
+      {/* Seção: Logs */}
+      <View style={styles.logsHeader}>
+        <Text style={styles.logTitle}>Retornos</Text>
+        <Pressable style={styles.clear} onPress={() => setLog('')}>
+          <Text style={styles.clearText}>Limpar logs</Text>
+        </Pressable>
+      </View>
       <Text selectable style={styles.log}>
         {log || 'Sem logs ainda.'}
       </Text>
@@ -153,6 +254,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: { fontSize: 20, fontWeight: '600', marginBottom: 16 },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 8,
+    marginBottom: 8,
+  },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   label: { width: 80 },
   input: {
@@ -163,14 +270,21 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 6,
   },
-  buttons: { marginVertical: 12, gap: 8 },
+  buttonsRow: {
+    marginVertical: 12,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   button: {
     backgroundColor: '#1e88e5',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    minWidth: 140,
   },
   danger: { backgroundColor: '#d32f2f' },
+  warning: { backgroundColor: '#f57c00' },
   buttonText: { color: 'white', fontWeight: '600' },
   secondary: {
     borderWidth: 1,
@@ -178,8 +292,23 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    minWidth: 140,
   },
   secondaryText: { color: '#1e88e5', fontWeight: '600' },
-  logTitle: { fontSize: 16, fontWeight: '600', marginTop: 16 },
+  logsHeader: {
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  logTitle: { fontSize: 16, fontWeight: '600' },
+  clear: {
+    borderWidth: 1,
+    borderColor: '#aaa',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  clearText: { color: '#555', fontWeight: '600' },
   log: { fontFamily: 'monospace' },
 });

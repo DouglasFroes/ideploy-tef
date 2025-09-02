@@ -4,6 +4,9 @@
     <intent>
       <action android:name="com.elgin.e1.digitalhub.TEF" />
     </intent>
+    <intent>
+      <action android:name="com.elgin.tefhub.CUSTOM" />
+    </intent>
   </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />

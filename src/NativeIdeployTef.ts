@@ -21,6 +21,25 @@ export interface Spec extends TurboModule {
     cnpjCpf?: string;
   }): Promise<any>;
   confirmarTransacao(): Promise<any>;
+  // Customização IDH
+  customizarAplicacao(params: {
+    logotipo?: string; // caminho da imagem
+    background?: string; // #RRGGBB
+    gradienteInicio?: string; // #RRGGBB
+    gradienteFim?: string; // #RRGGBB
+  }): Promise<boolean>;
+  customizarCabecalho(params: {
+    corBotao?: string;
+    corIcone?: string;
+    corFonte?: string;
+  }): Promise<boolean>;
+  customizarConteudo(params: {
+    corBotao?: string;
+    corIcone?: string;
+    corFonte?: string;
+    corFonteMensagem?: string;
+  }): Promise<boolean>;
+  limparCustomizacao(): Promise<boolean>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('IdeployTef');

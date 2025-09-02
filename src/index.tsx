@@ -23,6 +23,24 @@ export interface CancelarTransacaoParams {
   cnpjCpf?: string;
 }
 
+export interface CustomAplicacaoParams {
+  logotipo?: string;
+  background?: string;
+  gradienteInicio?: string;
+  gradienteFim?: string;
+}
+export interface CustomCabecalhoParams {
+  corBotao?: string;
+  corIcone?: string;
+  corFonte?: string;
+}
+export interface CustomConteudoParams {
+  corBotao?: string;
+  corIcone?: string;
+  corFonte?: string;
+  corFonteMensagem?: string;
+}
+
 // Resultado: o IDH retorna JSON (string); aqui padronizamos como objeto.
 export type TefRetorno = any;
 
@@ -79,6 +97,30 @@ export async function confirmarTransacao(): Promise<TefRetorno> {
   ensureAndroid();
   const ret = await IdeployTef.confirmarTransacao();
   return parseMaybeJson(ret);
+}
+
+// Customização IDH: aplica sem retorno do IDH (retorna boolean)
+export async function customizarAplicacao(
+  params: CustomAplicacaoParams
+): Promise<boolean> {
+  ensureAndroid();
+  return IdeployTef.customizarAplicacao(params as any);
+}
+export async function customizarCabecalho(
+  params: CustomCabecalhoParams
+): Promise<boolean> {
+  ensureAndroid();
+  return IdeployTef.customizarCabecalho(params as any);
+}
+export async function customizarConteudo(
+  params: CustomConteudoParams
+): Promise<boolean> {
+  ensureAndroid();
+  return IdeployTef.customizarConteudo(params as any);
+}
+export async function limparCustomizacao(): Promise<boolean> {
+  ensureAndroid();
+  return IdeployTef.limparCustomizacao();
 }
 
 // Função de exemplo mantida do template
